@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title><%= it.title %> | <%= it.siteTitle %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/assets/default.css">
+<% if (it.styles) { for (const style of it.styles) { %>
+  <link rel="stylesheet" href="<%= style %>">
+<% } } %>
+<% if (it.scripts) { for (const script of it.scripts) { %>
+  <script src="<%= script.src %>"<% if (script.defer) { %> defer=""<% } %>></script>
+<% } } %>
+<% if (it.path) { %>
+  <link rel="canonical" href="<%= it.origin + it.path %>">
+<% } %>
+<% if (it.path === '/') { %>
+  <meta name="twitter:card" content="summary">
+  <meta property="og:title" content="<%= it.siteTitle %>">
+  <meta property="og:image" content="<%= it.origin %>/images/cover.png">
+  <meta property="og:description" content="<%= it.description %>">
+<% } else if (it.image) { %>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:title" content="<%= it.title %>">
+  <meta property="og:image" content="<%= it.origin + it.image %>">
+  <meta property="og:image:alt" content="<%= it.message %>">
+  <meta property="og:description" content="<%= it.siteTitle %>">
+<% } %>
+</head>
+<body>
+  <div class="wrapper">
+    <header class="header nav">
+      <div class="header-wrapper">
+        <h1 class="site-title"><a href="/"><%= it.siteTitle %></a></h1>
+      </div>
+    </header>
+    <main class="main">
+      <div class="main-wrapper">
+<%~ it.body %>
+      </div>
+    </main>
+    <footer class="footer nav">
+      <div class="footer-wrapper">
+        <p><a href="https://twitter.com/JuYuwol">주유월 @JuYuwol</a></p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

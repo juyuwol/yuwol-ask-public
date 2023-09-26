@@ -1,0 +1,6 @@
+<form id="message-form" action="/submit" method="post">
+  <h2>메시지 보내기</h2>
+  <p><%= it.description %></p>
+  <p><textarea name="message" required="" maxlength="<%= it.messageMaxLength %>"></textarea></p>
+  <p class="message-submit-bar"><button id="message-submit" type="submit">보내기</button></p>
+</form>

@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@vercel/edge": "^1.1.0",
+    "canvaskit-wasm": "^0.38.2",
+    "eta": "^3.1.1"
+  }
+}

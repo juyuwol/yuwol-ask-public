@@ -1,0 +1,21 @@
+<% layout('layouts/default') %>
+<% it.scripts = [{ src: '/assets/message.js', defer: true }] %>
+<article>
+  <div class="post-header">
+    <h2 class="post-title"><%= it.title %></h2>
+    <p class="post-setting"><label class="checkbox-label"><input id="toggle-image" type="checkbox">이미지 보기</label></p>
+  </div>
+  <div class="post-info">
+    <h3 class="post-label">메시지</h3>
+    <p class="post-date"><time datetime="<%= it.messageDate %>"><%= it.messageDateText %></time></p>
+  </div>
+  <pre id="message" class="post-message"><%= it.message %></pre>
+  <div class="post-info">
+    <h3 class="post-label">답글</h3>
+    <p class="post-date"><time datetime="<%= it.replyDate %>"><%= it.replyDateText %></time></p>
+  </div>
+  <pre class="post-reply"><%= it.reply %></pre>
+</article>
+<p class="post-share"><a href="https://twitter.com/intent/tweet?text=<%~ encodeURIComponent(`${it.reply} ${it.origin}${it.path}`) %>">트위터 공유</a></p>
+<%~ include('includes/go-to-list') %>
+<%~ include('includes/message-form', { messageMaxLength: it.messageMaxLength, description: it.description }) %>

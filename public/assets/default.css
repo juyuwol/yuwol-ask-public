@@ -1,0 +1,318 @@
+* {
+  max-height: 100000000em;
+}
+html {
+  color-scheme: light dark;
+  line-height: 1.5;
+  text-underline-position: under;
+  word-wrap: anywhere;
+  overflow-wrap: anywhere;
+}
+body {
+  margin: 0;
+  overflow-y: scroll;
+}
+mark {
+  background: transparent;
+  color: inherit;
+  font-weight: bold;
+}
+time {
+  word-break: keep-all;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+button,
+[type="search"],
+textarea {
+  border: 1px solid;
+  line-height: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+button,
+[type="search"] {
+  font-size: 0.875em;
+}
+[type="search"],
+textarea {
+  background: transparent;
+  border-radius: 0;
+  color: inherit;
+}
+button {
+  border-radius: 4px;
+  padding: 0.125em 0.625em;
+}
+[type="checkbox"] {
+  margin: 0 0.25em 0 0;
+}
+[type="search"] {
+  padding: 0.125em 0.375em;
+}
+textarea {
+  box-sizing: border-box;
+  display: block;
+  font-size: inherit;
+  padding: 0.25em 0.5em;
+  resize: vertical;
+  width: 100%;
+  height: 7em;
+}
+h1,
+h2,
+h3 {
+  word-break: keep-all;
+}
+h2 {
+  font-size: 1.25em;
+  margin: 1.2em 0;
+}
+h3 {
+  font-size: 1em;
+  margin: 1.5em 0;
+}
+p,
+pre,
+ul {
+  margin: 1.5em 0;
+}
+pre {
+  font-size: inherit;
+  font-family: inherit;
+  white-space: pre-wrap;
+}
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+}
+.nav a:not(:hover):not(:focus) {
+  text-decoration: none;
+}
+.nav a:not(:active) {
+  color: inherit;
+}
+[data-loading] {
+  display: none;
+}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.header,
+.main,
+.footer {
+  width: 100%;
+}
+.header {
+  border-bottom: 1px solid;
+}
+.main {
+  flex-grow: 1;
+}
+.footer {
+  border-top: 1px solid;
+}
+.header-wrapper,
+.main-wrapper,
+.footer-wrapper {
+  margin: 0 auto;
+  padding: 0 12px;
+  overflow: auto;
+  max-width: 32em;
+}
+.header-wrapper {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+.main-wrapper {
+  padding-bottom: 1.5em;
+}
+.footer-wrapper {
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;
+}
+.site-title {
+  font-size: 1em;
+  margin: 0;
+}
+.search-bar {
+  display: flex;
+  margin-left: auto;
+  max-width: 14em;
+}
+.search-field {
+  flex-grow: 1;
+  margin-right: 0.375em;
+  width: 1px;
+}
+.pager {
+  margin: 1.5em 0;
+  overflow-x: auto;
+}
+.pager-list {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+.pager-item {
+  display: inline-block;
+}
+.pager-item[hidden] {
+  visibility: hidden;
+}
+.pager-prev {
+  margin-left: 0.5em;
+}
+.pager-curr {
+  margin: 0 0.5em;
+  min-width: 2em;
+}
+.pager-next {
+  margin-right: 0.5em;
+}
+@media (max-width: 360px) {
+  .pager-label {
+    clip-path: inset(50%);
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+    height: 1px;
+  }
+}
+.post-stats {
+  word-break: keep-all;
+}
+.post-list {
+  padding: 0;
+}
+.post-item {
+  border: 0 solid;
+  border-bottom-width: 1px;
+  list-style: none;
+}
+.post-item:first-child {
+  border-top-width: 1px;
+}
+.post-header,
+.post-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin: 1.5em 0;
+}
+.post-setting,
+.post-date {
+  flex-grow: 1;
+  text-align: right;
+}
+.post-title {
+  margin: 0;
+}
+.post-setting {
+  margin: 0.0625em 0 0 24px;
+}
+.post-label {
+  margin: 0 24px 0 0;
+}
+.post-date {
+  margin: 0;
+}
+.post-share {
+  text-align: right;
+}
+.go-to {
+  border: solid;
+  border-width: 1px 0;
+  padding: 0.5em 0;
+  text-align: center;
+}
+.message-submit-bar {
+  text-align: right;
+}
+body {
+  background: #fff;
+  color: #000;
+}
+a {
+  color: #347;
+}
+a:active {
+  color: #e30;
+}
+time {
+  color: #666;
+}
+button,
+[type="search"],
+textarea {
+  border-color: #888;
+}
+button:focus,
+button:hover,
+[type="search"]:focus,
+[type="search"]:hover,
+textarea:focus,
+textarea:hover {
+  border-color: #000;
+}
+button {
+  background: #eee;
+  color: #000;
+}
+button:active {
+  background: #ccc;
+}
+.header,
+.footer,
+.post-item,
+.go-to {
+  border-color: #aaa;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #000;
+    color: #eee;
+  }
+  a {
+    color: #def;
+  }
+  a:active {
+    color: #fba;
+  }
+  time {
+    color: #ccc;
+  }
+  button,
+  [type="search"],
+  textarea {
+    border-color: #bbb;
+  }
+  button:focus,
+  button:hover,
+  [type="search"]:focus,
+  [type="search"]:hover,
+  textarea:focus,
+  textarea:hover {
+    border-color: #fff;
+  }
+  button {
+    background: #333;
+    color: #eee;
+  }
+  button:active {
+    background: #555;
+  }
+  .header,
+  .footer,
+  .post-item,
+  .go-to {
+    border-color: #777;
+  }
+}

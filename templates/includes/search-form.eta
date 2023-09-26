@@ -1,0 +1,6 @@
+<form id="search-form" class="search-form" action="/search/">
+  <p class="search-bar">
+    <input id="search-field" class="search-field" type="search" name="q">
+    <button class="search-submit" type="submit">검색</button>
+  </p>
+</form>

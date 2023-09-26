@@ -1,0 +1,3 @@
+<% layout('layouts/default') %>
+<h2><%= it.title %></h2>
+<p><%= it.message %></p>

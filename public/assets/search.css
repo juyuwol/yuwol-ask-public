@@ -1,0 +1,7 @@
+.search-form,
+.js-search .search-fallback {
+  display: none;
+}
+.js-search .search-form {
+  display: block;
+}

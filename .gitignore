@@ -1,0 +1,8 @@
+node_modules/
+public/mailbox/index.html
+public/posts/
+public/lists/
+public/search/
+public/submit/
+public/*.html
+*.ps1

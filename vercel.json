@@ -1,0 +1,60 @@
+{
+  "buildCommand": "node build.js",
+  "outputDirectory": "public",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "cache-control", "value": "max-age=86400" }
+      ]
+    },
+    {
+      "source": "/(.*).png",
+      "headers": [
+        { "key": "cache-control", "value": "max-age=2592000, immutable" }
+      ]
+    },
+    {
+      "source": "/(lists/.*|search/data.json)",
+      "headers": [
+        { "key": "cache-control", "value": "max-age=180" }
+      ]
+    },
+    {
+      "source": "/favicon.ico",
+      "headers": [
+        { "key": "cache-control", "value": "max-age=2592000, immutable" },
+        { "key": "content-type", "value": "image/png" }
+      ]
+    },
+    {
+      "source": "/mailbox/(replied|unreplied).json",
+      "headers": [
+        { "key": "cache-control", "value": "no-cache, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/(mailbox/delete|mailbox/modify|mailbox/reply|submit)",
+      "headers": [
+        { "key": "cache-control", "value": "no-store" }
+      ]
+    }
+  ],
+  "redirects": [
+    { "source": "/posts/", "destination": "/", "statusCode": 301 },
+    { "source": "/lists/", "destination": "/lists/1.html", "statusCode": 301 }
+  ],
+  "rewrites": [
+    { "source": "/submit", "destination": "/api/message.js" },
+    { "source": "/mailbox/replied.json", "destination": "/search/data.json" },
+    { "source": "/mailbox/unreplied.json", "destination": "/api/unreplied.js" },
+    { "source": "/mailbox/delete", "destination": "/api/delete.js" },
+    { "source": "/mailbox/modify", "destination": "/api/modify.js" },
+    { "source": "/mailbox/reply", "destination": "/api/reply.js" }
+  ],
+  "functions": {
+    "api/reply.js": {
+      "includeFiles": "node_modules/canvaskit-wasm/bin/canvaskit.wasm"
+    }
+  }
+}

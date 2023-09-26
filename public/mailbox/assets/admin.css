@@ -1,0 +1,17 @@
+[type="radio"] {
+  margin: 0 0.25em 0 0;
+}
+.radio-label {
+  display: inline-flex;
+  align-items: center;
+}
+.radio-label + .radio-label {
+  margin-left: 0.25em;
+}
+.admin-pager {
+  text-align: center;
+}
+.admin-pager-curr {
+  display: inline-block;
+  min-width: 3em;
+}

@@ -1,0 +1,17 @@
+<% layout('layouts/default') %>
+<% it.title = '검색' %>
+<% it.styles = ['/assets/search.css'] %>
+<% it.scripts = [{ src: '/assets/search.js' }] %>
+<%~ include('includes/search-form') %>
+<div id="search-fallback" class="search-fallback">
+  <h2>오류 발생</h2>
+  <p>자바스크립트 혹은 데이터를 불러오는 데 실패해 검색을 할 수 없습니다. 브라우저의 자바스크립트 활성화 여부 및 네트워크 환경을 확인 후 새로고침해 주세요.</p>
+</div>
+<p id="post-stats" class="post-stats"></p>
+<% const pager = { pager: { pageNum: '', first: '', prev: '', next: '', last: '', hidden: true } } %>
+<%~ include('includes/pager', pager) %>
+<ul id="post-list" class="post-list" data-per-page="<%= it.perPage %>"></ul>
+<%~ include('includes/pager', pager) %>
+<template id="post-item-template">
+<%~ include('includes/post-item', { items: [{}] }) %>
+</template>

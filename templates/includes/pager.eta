@@ -1,0 +1,20 @@
+<% const { pageNum, first, prev, next, last, hidden } = it.pager %>
+<nav class="pager nav"<% if (hidden) { %> hidden=""<% } %>>
+  <ul class="pager-list">
+<% if (prev !== undefined) { %>
+    <li class="pager-item pager-first"><a href="<%= first %>"><span aria-hidden="true">&lt;&lt;</span> <span class="pager-label">맨앞</span></a></li>
+    <li class="pager-item pager-prev"><a href="<%= prev %>"><span aria-hidden="true">&lt;</span> <span class="pager-label">이전</span></a></li>
+<% } else { %>
+    <li class="pager-item pager-first" hidden="">&lt;&lt; <span class="pager-label">맨앞</span></li>
+    <li class="pager-item pager-prev" hidden="">&lt; <span class="pager-label">이전</span></li>
+<% } %>
+    <li class="pager-item pager-curr"><%= pageNum %></li>
+<% if (next !== undefined) { %>
+    <li class="pager-item pager-next"><a href="<%= next %>"><span class="pager-label">다음</span> <span aria-hidden="true">&gt;</span></a></li>
+    <li class="pager-item pager-last"><a href="<%= last %>"><span class="pager-label">맨끝</span> <span aria-hidden="true">&gt;&gt;</span></a></li>
+<% } else { %>
+    <li class="pager-item pager-next" hidden=""><span class="pager-label">다음</span> &gt;</li>
+    <li class="pager-item pager-last" hidden=""><span class="pager-label">맨끝</span> &gt;&gt;</li>
+<% } %>
+  </ul>
+</nav>

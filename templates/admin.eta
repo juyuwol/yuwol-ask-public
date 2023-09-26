@@ -1,0 +1,71 @@
+<% layout('layouts/default') %>
+<% it.title = '관리' %>
+<% it.styles = ['/mailbox/assets/admin.css'] %>
+<% it.scripts = [{ src: '/mailbox/assets/admin.js', defer: true }] %>
+<p class="tabs">
+  <label class="radio-label"><input class="tab" type="radio" name="tab" data-tab="unreplied"> 답하기</label>
+  <label class="radio-label"><input class="tab" type="radio" name="tab" data-tab="replied"> 고치기</label>
+</p>
+<p class="admin-pager" hidden="">
+  <button class="admin-pager-first" type="button">맨앞</button>
+  <button class="admin-pager-prev" type="button">이전</button>
+  <span class="admin-pager-curr">1</span>
+  <button class="admin-pager-next" type="button">다음</button>
+  <button class="admin-pager-last" type="button">맨끝</button>
+</p>
+<p id="count"></p>
+<form id="delete" action="/mailbox/delete" method="post" hidden="">
+  <p><button class="submit" type="submit">선택 삭제</button></p>
+</form>
+<div id="content" data-per-page="<%= it.perPage %>"></div>
+<p class="admin-pager" hidden="">
+  <button class="admin-pager-first" type="button">맨앞</button>
+  <button class="admin-pager-prev" type="button">이전</button>
+  <span class="admin-pager-curr">1</span>
+  <button class="admin-pager-next" type="button">다음</button>
+  <button class="admin-pager-last" type="button">맨끝</button>
+</p>
+<template id="template-reply-item">
+  <form class="post-item" action="/mailbox/reply" method="post">
+    <input name="id" type="hidden">
+    <input name="message-date" type="hidden">
+    <input name="message" type="hidden">
+    <input name="value" type="hidden">
+    <p><label class="checkbox-label"><input class="checkbox" type="checkbox"> 삭제</label></p>
+    <p class="message-date"></p>
+    <pre class="message"></pre>
+    <p><textarea class="reply" name="reply"></textarea></p>
+    <p><button class="submit" type="submit">작성</button></p>
+  </form>
+</template>
+<template id="template-reply-success">
+  <div class="post-item">
+    <p class="message-date"></p>
+    <img class="image">
+    <pre class="message"></pre>
+    <p class="reply-date"></p>
+    <pre class="reply"></pre>
+    <p><a class="link">바로가기</a></p>
+  </div>
+</template>
+<template id="template-modify-item">
+  <form class="post-item" action="/mailbox/modify" method="post">
+    <input name="id" type="hidden">
+    <p><label class="checkbox-label"><input class="checkbox" type="checkbox"> 삭제</label></p>
+    <p class="message-date"></p>
+    <pre class="message"></pre>
+    <p class="reply-date"></p>
+    <pre class="reply"></pre>
+    <p><textarea class="new-reply" name="reply"></textarea></p>
+    <p><button class="submit" type="submit">수정</button></p>
+  </form>
+</template>
+<template id="template-delete-item">
+  <div class="post-item">
+    <p><label class="checkbox-label"><input class="checkbox" type="checkbox"> 삭제</label></p>
+    <p class="message-date"></p>
+    <pre class="message"></pre>
+    <p class="reply-date"></p>
+    <pre class="reply"></pre>
+  </div>
+</template>
