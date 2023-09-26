@@ -88,7 +88,7 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
 
 [config.js](config.js) 파일이 내보내는 객체는 사이트의 각종 설정을 담당한다.
 
-- `perPage`: 메시지/답글 목록, 검색 결과, 관리자 페이지 등에서 한 페이지에 한 번에 표시될 글의 수. 정수.
+- `perPage`: 메시지/답글 목록, 검색 결과, 관리자 페이지의 글 목록에서 한 페이지에 한 번에 표시될 글의 수. 정수.
 - `messageMaxLength`: 받을 메시지의 최대 글자수. 정수.
 - `origin`: 사이트의 URL Origin. Vercel은 HTTPS가 강제되므로 'https://' + 도메인 형태가 된다.
 - `email`:
@@ -104,6 +104,33 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
 
 [Skia의 CanvasKit](https://www.npmjs.com/package/canvaskit-wasm) 라이브러리를 사용한다. [image/image-builder.js](image/image-builder.js) 파일이 이미지 생성을 하는 스크립트다.
 
+Node.js에서의 활용법 예시:
+
+``` javascript
+// 파일 로드를 위한 모듈 불러오기
+import { writeFileSync } from 'fs';
+import { readFile } from 'fs/promises';
+
+// 생성자 불러오기
+import ImageBuilder from './image-builder.js';
+
+// 폰트 로드
+const paths = ['latin.woff', 'emoji.ttf'];
+const fonts = await Promise.all(paths.map(e => readFile(e)));
+
+// 생성자 생성
+const builder = new ImageBuilder(fonts);
+
+// 이미지 생성
+const image = builder.generate('Lorem ipsum');
+
+// 생성자 메모리 해제
+builder.free();
+
+// 이미지 저장
+writeFileSync('output.png', image);
+```
+
 본 저장소에는 폰트 파일이 빠져 있지만, 폰트를 넣지 않으면 CanvasKit은 텍스트를 렌더링하지 못한다. 이미지 생성 스크립트 또한 폰트가 없는 경우를 상정하지 않고 작성되었다.
 
 폰트는 'image' 디렉토리 하위에 'font' 디렉토리를 생성해서 폰트 파일들을 위치시키고, 'config.js' 객체의 `fontFiles` 필드에 파일명들을 배열 형태로 기입하여 설정한다. 먼저 오는 폰트일수록 글리프 우선순위가 높다. 가령 값이 `['A.woff', 'B.ttf']`고, A와 B 폰트 모두 'a' 문자에 대한 글리프를 갖고 있다면, 이미지에 출력되는 'a' 문자는 A 폰트의 글리프다.
@@ -116,7 +143,7 @@ CanvasKit을 다루려면 [Node.js용 예시 코드](https://github.com/google/s
 
 ## Vercel 설정
 
-서버리스/Edge 함수 응답을 포함한 모든 HTTP 헤더 설정은 [vercel.json](vercel.json) 파일에서 일괄적으로 관리한다.
+서버리스/Edge 함수 응답을 포함한 모든 HTTP 헤더와 리다이렉트, 리라이트 설정은 [vercel.json](vercel.json) 파일에서 일괄적으로 관리한다.
 
 [middleware.js](middleware.js) 파일은 관리자 디렉토리('/mailbox/')에 Basic 인증을 설정한다. 빌드된 에러 페이지와 Vercel 함수의 원 경로('/api/:path')에 대한 접근을 막고 404를 띄우는 일도 한다. '/api/:path'에 대한 접근을 막아야 하는 이유는 인증이 '/mailbox/' 경로에 걸려있기 때문에 '/api/:path'로 접근하면 인증 없이 관리자용 앱에 액세스할 수 있게 되기 때문이다.
 
@@ -132,7 +159,7 @@ CanvasKit을 다루려면 [Node.js용 예시 코드](https://github.com/google/s
 ## FAQ
 
 - 이 소스로 저만의 익명 메시지 응모 사이트를 만들고 싶습니다. 가능한가요?
-  - 네, 그러라고 오픈소스로 풀었습니다. 하지만 사용하실 때 코드에 있는 제 사적인 정보들은 반드시 지워주세요. [config.js](config.js), [templates/layouts/defualt.eta](templates/layouts/defualt.eta), [templates/home.eta](templates/home.eta)을 수정해 주시면 됩니다.
+  - 네, 그러라고 오픈소스로 풀었습니다. 하지만 사용하실 때 코드에 있는 제 사적인 정보들은 반드시 지워주세요. [config.js](config.js), [templates/layouts/default.eta](templates/layouts/default.eta), [templates/home.eta](templates/home.eta)을 수정해 주시면 됩니다.
 - 이 소스를 수정해서 제 사이트를 만들고 있는데, 어려움이 생겼습니다. 도와주실 수 있나요?
   - 네, 질문은 환영합니다! 제 [트위터(@JuYuwol)](https://twitter.com/JuYuwol)나 [사서함](https://ask.yuwol.pe.kr/)으로 와 주세요. 하지만 하다가 중간에 막힌 게 아니라, 구체적으로 어떻게 시작해야 할지 전혀 모르겠는 거라면, 유지관리에 필요한 기본 지식이 부족하다는 뜻이기 때문에 그냥 페잉 등을 사용하시는 게 최선입니다.
 - 전혀 모르겠지만 (여러 필사적인 사정으로) 그래도 갖고 싶습니다. 대신 설치해 주실 수 있나요?
