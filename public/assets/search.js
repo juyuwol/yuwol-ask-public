@@ -258,7 +258,7 @@ function search() {
       replyDate = item.querySelector('.post-reply-date');
   
       link.href = '/posts/' + result.id + '.html';
-      title.textContent = titleFilter(result.messageDate);
+      title.textContent = titleFilter(result.messageDate, result.count);
       messageDate.textContent = dateFilter(result.messageDate);
       replyDate.textContent = dateFilter(result.replyDate);
       messageDate.setAttribute('datetime', result.messageDate);
@@ -319,12 +319,12 @@ function highlight(elm, text, qlen) {
   if (loc < tlen) elm.appendChild(document.createTextNode(text.slice(loc)));
 }
 
-function titleFilter(date) {
+function titleFilter(date, count) {
   var mm = date.slice(5, 7);
   var dd = date.slice(8, 10);
   if (mm[0] === '0') mm = mm[1];
   if (dd[0] === '0') dd = dd[1];
-  return date.slice(2, 4) + '년 ' + mm + '월 ' + dd + '일 메시지';
+  return date.slice(2, 4) + '년 ' + mm + '월 ' + dd + '일 ' + count + '번째 메시지';
 }
 
 function dateFilter(date) {

@@ -72,22 +72,35 @@ const lastPage = (total > perPage) ? Math.ceil(total / perPage) : 1;
 const listFirstPath = `/${listDir}/1.html`;
 const listLastPath = `/${listDir}/${lastPage}.html`;
 const replied = [];
+
+let prevDate = '';
+let count = 1;
+datas.sort((a, b) => {
+  return (a.id > b.id) ? -1 : 1;
+});
+for (let i = total - 1; i >= 0; i--) {
+  const date = datas[i].messageDate.slice(0, 10);
+  count = (prevDate === date) ? (count + 1) : 1;
+  datas[i].count = count;
+  prevDate = date;
+}
+
 let items = [];
 let page = 1;
 let listPath = listFirstPath;
 datas.sort((a, b) => {
-  return (a.replyDate > b.replyDate || (a.replyDate === b.replyDate && a.id > b.id)) ? -1 : 1;
+  return (a.replyDate > b.replyDate) ? -1 : 1;
 });
 for (const data of datas) {
-  const { id, messageDate, message, replyDate, reply } = data;
-  data.title = titleFilter(messageDate);
+  const { id, messageDate, message, replyDate, reply, count } = data;
+  data.title = titleFilter(messageDate, count);
   data.messageDateText = dateFilter(messageDate);
   data.replyDateText = dateFilter(replyDate);
   data.path = `/${postDir}/${id}.html`;
   data.image = `/${imageDir}/${id}.png`;
   writePage(join(postDir, `${id}.html`), 'post', data);
   items.push(data);
-  replied.push({ id, messageDate, message, replyDate, reply });
+  replied.push({ id, messageDate, message, replyDate, reply, count });
   if (items.length === perPage) writeList();
 }
 if (total === 0 || items.length > 0) writeList();
@@ -121,12 +134,12 @@ function writePage(path, template, data) {
   writeFile(join(destDir, path), content, err);
 }
 
-function titleFilter(date) {
+function titleFilter(date, count) {
   let mm = date.slice(5, 7);
   let dd = date.slice(8, 10);
   if (mm[0] === '0') mm = mm[1];
   if (dd[0] === '0') dd = dd[1];
-  return `${date.slice(2, 4)}년 ${mm}월 ${dd}일 메시지`;
+  return `${date.slice(2, 4)}년 ${mm}월 ${dd}일 ${count}번째 메시지`;
 }
 
 function dateFilter(date) {

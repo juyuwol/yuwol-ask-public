@@ -9,8 +9,8 @@ const TXT_OPTS = { encoding: 'utf8' };
 
 const root = fileURLToPath(dirname(import.meta.url));
 const temp = 'Z:/TEMP';
-const dataDir = join(temp, 'data');
-const imageDir = join(temp, 'images');
+const dataDir = join(root, 'data');
+const imageDir = join(temp, 'images1');
 const fonts = await Promise.all((() => {
   const dir = join(root, 'image', 'fonts');
   const files = config.fontFiles;
@@ -20,8 +20,8 @@ const fonts = await Promise.all((() => {
   }
   return promises;
 })());
+const files = readdirSync(dataDir).slice(500);
 const datas = await Promise.all((() => {
-  const files = readdirSync(dataDir);
   const promises = [];
   for (const file of files) {
     promises.push(readFile(join(dataDir, file), TXT_OPTS).then(data => {

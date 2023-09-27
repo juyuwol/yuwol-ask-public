@@ -7,7 +7,7 @@ export default class ImageBuilder {
     // Set values
     const background = CanvasKit.WHITE;
     const color = CanvasKit.BLACK;
-    const borderWidth = 26;
+    const borderWidth = 39;
     const borderColor = CanvasKit.Color(187, 187, 187);
     const fontSize = 26;
     const lineHeight = 1.5;
