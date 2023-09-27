@@ -41,8 +41,7 @@
     }
   ],
   "redirects": [
-    { "source": "/posts/", "destination": "/", "statusCode": 301 },
-    { "source": "/lists/", "destination": "/lists/1.html", "statusCode": 301 }
+    { "source": "/(lists|posts)/", "destination": "/lists/1.html", "statusCode": 301 }
   ],
   "rewrites": [
     { "source": "/submit", "destination": "/api/message.js" },

@@ -175,7 +175,7 @@ pre {
 .pager-next {
   margin-right: 0.5em;
 }
-@media (max-width: 360px) {
+@media (max-width: 350px) {
   .pager-label {
     clip-path: inset(50%);
     overflow: hidden;
