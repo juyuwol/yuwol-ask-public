@@ -17,11 +17,12 @@ export default async function handler(req, res) {
 
   const message = (() => {
     try {
-      return req.body.message;
+      return req.body.message.replace(/\r/g, '');
     } catch (e) {
       return null;
     }
   })();
+
   if (
     !message ||
     typeof message !== 'string' ||
