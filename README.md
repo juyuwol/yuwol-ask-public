@@ -69,7 +69,6 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
   - [search.eta](templates/search.eta): 검색 페이지
   - [status.eta](templates/status.eta): 범용 상태 페이지(에러, 응답 성공 등)
 - [build.js](build.js): 사이트 빌드 스크립트
-- [build-images.js](build-images.js): 이미지 전체 빌드 스크립트 (개발용)
 - [config.js](config.js): 설정 파일
 - [middleware.js](middleware.js): Vercel 미들웨어 함수
 - [vercel.json](vercel.json): Vercel 설정 파일
@@ -119,33 +118,6 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
 
 [Skia의 CanvasKit](https://www.npmjs.com/package/canvaskit-wasm) 라이브러리를 사용한다. [image/image-builder.js](image/image-builder.js) 파일이 이미지 생성을 하는 스크립트다.
 
-Node.js에서의 활용법 예시:
-
-``` javascript
-// 파일 로드를 위한 모듈 불러오기
-import { writeFileSync } from 'fs';
-import { readFile } from 'fs/promises';
-
-// 생성자 불러오기
-import ImageBuilder from './image/image-builder.js';
-
-// 폰트 불러오기
-const paths = ['./image/fonts/hangeul.woff', './image/fonts/emoji.ttf'];
-const fonts = await Promise.all(paths.map(e => readFile(e)));
-
-// 생성자 생성
-const builder = new ImageBuilder(fonts);
-
-// 이미지 생성
-const image = builder.generate('로렘 입숨');
-
-// 생성자 메모리 해제
-builder.free();
-
-// 이미지 저장
-writeFileSync('output.png', image);
-```
-
 본 저장소에는 폰트 파일이 빠져 있지만, 폰트를 넣지 않으면 CanvasKit은 텍스트를 렌더링하지 못한다. 이미지 생성 스크립트 또한 폰트가 없는 경우를 상정하지 않고 작성되었다.
 
 폰트는 'image' 디렉토리 하위에 'font' 디렉토리를 생성해서 폰트 파일들을 위치시키고, 'config.js' 객체의 `fontFiles` 필드에 파일명들을 배열 형태로 기입하여 설정한다. 먼저 오는 폰트일수록 글리프 우선순위가 높다. 가령 값이 `['A.woff', 'B.ttf']`고, A와 B 폰트 모두 'a' 문자에 대한 글리프를 갖고 있다면, 이미지에 출력되는 'a' 문자는 A 폰트의 글리프다.
@@ -154,9 +126,124 @@ writeFileSync('output.png', image);
 
 이미지 형태를 변경하려면(글자 크기, 테두리 선 색/두께, 여백 등등) 이미지 생성 스크립트의 코드 안에서 변수 값을 직접 변경해야 한다. 딱히 주석을 달아놓지는 않았지만 변수명이 곧 하는 일이라서 그렇게 반직관적이지는 않다, 아마도.
 
-[build-images.js](build-images.js) 스크립트는 다수의 데이터 파일의 메시지로부터 이미지를 생성하는 개발용 스크립트로, 바로 사용하기는 어렵지만 예시로 보고 사용할 수 있다. 기존 데이터를 마이그레이션하려면, 이미지를 같이 사전 빌드해야 하기 때문에 필요하다. 알아 두어야 할 유의사항은 알 수 없는 이유에서 다수의 이미지를 생성하면 메모리가 줄줄 새서 도중에 프로그램이 터진다는 점이다. 아마도 WASM 문제 같은데, 현 시점에서 알아낸 유일한 해결책은 그냥 적당한 숫자(500개 이하 정도면 안정적인 것 같다)로 이미지를 끊어서 생성하는 것뿐이다.
-
 CanvasKit을 다루려면 [Node.js용 예시 코드](https://github.com/google/skia/blob/main/modules/canvaskit/npm_build/node.example.js)와 [Typescript 함수 정의](https://github.com/google/skia/blob/main/modules/canvaskit/npm_build/types/index.d.ts), 그리고 Skia 홈페이지의 [Quickstart 페이지](https://skia.org/docs/user/modules/quickstart/)를 참조할 수 있다.
+
+Node.js에서의 활용법 예시 1:
+
+``` javascript
+// 파일 로드를 위한 모듈 불러오기
+import { writeFileSync } from 'fs';
+import { readFile } from 'fs/promises';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+// 설정 불러오기
+import config from './config.js';
+
+// 생성자 불러오기
+import ImageBuilder from './image/image-builder.js';
+
+// 디렉토리 설정
+const projectDir = fileURLToPath(dirname(import.meta.url));
+const dataDir = join(projectDir, 'data');
+
+// 폰트 불러오기
+const fonts = await Promise.all((() => {
+  const dir = join(projectDir, 'image', 'fonts');
+  const files = config.fontFiles;
+  const promises = [];
+  for (const file of files) {
+    promises.push(readFile(join(dir, file)));
+  }
+  return promises;
+})());
+
+// 텍스트 예문
+const message = '프리벳 가 4번지에 사는 더즐리 부부는 자신들이 정상적이라는 것을 아주 자랑스럽게 여기는 사람들이었다. 그들은 기이하거나 신비스러운 일과는 전혀 무관해 보였다. 아니, 그런 터무니없는 것은 도저히 참아 내지 못했다.';
+
+// 생성자 생성
+const builder = new ImageBuilder(fonts);
+
+// 이미지 생성, 저장
+writeFileSync('test.png', builder.generate(message));
+
+//생성자 메모리 해제
+builder.free();
+```
+
+이상의 코드는 테스트 이미지('test.png')를 생성하는 스크립트다.
+
+Node.js에서의 활용법 예시 2:
+
+``` javascript
+// 파일 로드를 위한 모듈 불러오기
+import { mkdirSync, readdirSync, writeFileSync } from 'fs';
+import { readFile } from 'fs/promises';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+// 설정 불러오기
+import config from './config.js';
+
+// 생성자 불러오기
+import ImageBuilder from './image/image-builder.js';
+
+// 디렉토리 설정
+const projectDir = fileURLToPath(dirname(import.meta.url));
+const dataDir = join(projectDir, 'data');
+const imageDir = join(projectDir, 'public', 'images');
+
+// 폰트 불러오기
+const fonts = await Promise.all((() => {
+  const dir = join(projectDir, 'image', 'fonts');
+  const files = config.fontFiles;
+  const promises = [];
+  for (const file of files) {
+    promises.push(readFile(join(dir, file)));
+  }
+  return promises;
+})());
+
+// 데이터 불러오기
+const datas = await Promise.all((() => {
+  const files = readdirSync(dataDir).slice(500);
+  const promises = [];
+  for (const file of files) {
+    promises.push(readFile(join(dataDir, file), 'utf8').then(data => {
+      const { id, message } = JSON.parse(data);
+      return { id, message };
+    }));
+  }
+  return promises;
+})());
+
+// 디렉토리 생성
+mkdirSync(imageDir, { recursive: true });
+
+// 생성자 생성
+const builder = new ImageBuilder(fonts);
+
+// 이미지 생성, 저장
+for (const data of datas) {
+  const { id, message } = data;
+  writeFileSync(join(imageDir, `${id}.png`), builder.generate(message));
+}
+
+//생성자 메모리 해제
+builder.free();
+```
+
+이상의 코드는 전체 데이터 파일로부터 일괄적으로 이미지를 생성하는 스크립트다. 다만 모종의 WASM 문제로, 다수의 이미지를 생성하면 메모리가 줄줄 새서 도중에 프로그램이 터진다. 적당한 단위(500개 이하 정도면 안정적인 것 같다)로 끊어서 생성하자.
+
+## 템플릿 설정
+
+본 저장소에는 포함되어 있지 않지만 템플릿 출력에서 호출되는 파일이 두 개 있다. (출력 디렉토리 기준으로) '/favicon.ico'와 '/images/cover.png' 두 파일이다.
+
+템플릿 코드를 손대지 않으면서 문제 없이 돌아가게 만들려면, 각각 'public/favicon.ico', 'public/images/cover.png'에 파일을 추가하면 된다.
+
+여기서 'favicon.ico' 파일은 파비콘 역할이다. 확장자와 별개로, ICO 포맷이 아닌 PNG 포맷이어야 한다. [vercel.json](vercel.json) 파일에서 헤더를 PNG 포맷으로 명시해 두었기 때문이다.
+
+'cover.png' 파일은 메인 페이지의 트위터 섬네일 역할이다. 상세는 [templates/layouts/default.eta](templates/layouts/default.eta)의 소셜 메타데이터 코드와 [트위터 카드 공식 문서](https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/abouts-cards)를 참조.
 
 ## Vercel 설정
 

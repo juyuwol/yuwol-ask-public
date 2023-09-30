@@ -4,9 +4,9 @@
 html {
   color-scheme: light dark;
   line-height: 1.5;
-  text-underline-position: under;
-  word-wrap: anywhere;
+  word-wrap: break-word;
   overflow-wrap: anywhere;
+  text-underline-position: under;
 }
 body {
   margin: 0;

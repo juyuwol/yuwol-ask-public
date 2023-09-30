@@ -1,6 +1,6 @@
 import { readdirSync, writeFile } from 'fs';
 import { readFile, mkdir } from 'fs/promises';
-import { dirname, join } from 'path';
+import { basename, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { Eta } from 'eta';
 import config from './config.js';
@@ -8,17 +8,19 @@ import config from './config.js';
 const DIR_OPTS = { recursive: true };
 const TXT_OPTS = { encoding: 'utf8' };
 
-const root = fileURLToPath(dirname(import.meta.url));
-const dataDir = join(root, 'data');
-const templateDir = join(root, 'templates');
-const destDir = join(root, 'public');
+const projectDir = fileURLToPath(dirname(import.meta.url));
+const dataDir = join(projectDir, 'data');
+const templateDir = join(projectDir, 'templates');
+const destDir =
+  (process.env.NODE_ENV === 'development') ?
+  join('Z:', basename(dirname(import.meta.url))) :
+  join(projectDir, 'public');
 const adminDir = 'mailbox';
 const imageDir = 'images';
 const listDir = 'lists';
 const postDir = 'posts';
 const searchDir = 'search';
 const submitDir = 'submit';
-const { perPage } = config;
 
 // Initialize a template engine
 const eta = new Eta({ views: templateDir, cache: true });
@@ -58,10 +60,12 @@ writePage(join(submitDir, 'success.html'), 'status', {
 });
 
 // Write post and list pages
+const { perPage } = config;
 const datas = await Promise.all((() => {
   const files = readdirSync(dataDir);
   const promises = [];
   for (const file of files) {
+    if (!file.endsWith('.json')) continue;
     const path = join(dataDir, file);
     promises.push(readFile(path, TXT_OPTS).then(data => JSON.parse(data)));
   }
@@ -73,12 +77,8 @@ const listFirstPath = `/${listDir}/1.html`;
 const listLastPath = `/${listDir}/${lastPage}.html`;
 const replied = [];
 
-let prevDate = '';
-let count = 1;
-datas.sort((a, b) => {
-  return (a.id > b.id) ? -1 : 1;
-});
-for (let i = total - 1; i >= 0; i--) {
+datas.sort((a, b) => (a.id > b.id) ? -1 : 1);
+for (let i = total - 1, prevDate = '', count = 1; i >= 0; i--) {
   const date = datas[i].messageDate.slice(0, 10);
   count = (prevDate === date) ? (count + 1) : 1;
   datas[i].count = count;
@@ -88,9 +88,7 @@ for (let i = total - 1; i >= 0; i--) {
 let items = [];
 let page = 1;
 let listPath = listFirstPath;
-datas.sort((a, b) => {
-  return (a.replyDate > b.replyDate) ? -1 : 1;
-});
+datas.sort((a, b) => (a.replyDate > b.replyDate) ? -1 : 1);
 for (const data of datas) {
   const { id, messageDate, message, replyDate, reply, count } = data;
   data.title = titleFilter(messageDate, count);
