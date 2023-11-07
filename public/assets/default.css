@@ -23,6 +23,7 @@ time {
 img {
   display: block;
   max-width: 100%;
+  height: auto;
 }
 button,
 [type="search"],
@@ -94,7 +95,7 @@ pre {
 .nav a:not(:active) {
   color: inherit;
 }
-[data-loading] {
+html[hidden] {
   display: none;
 }
 .wrapper {
@@ -252,9 +253,6 @@ a {
 a:active {
   color: #e30;
 }
-time {
-  color: #666;
-}
 button,
 [type="search"],
 textarea {
@@ -281,6 +279,9 @@ button:active {
 .go-to {
   border-color: #aaa;
 }
+.post-date {
+  color: #666;
+}
 .post-message,
 .post-reply {
   border-color: #ddd;
@@ -295,9 +296,6 @@ button:active {
   }
   a:active {
     color: #fba;
-  }
-  time {
-    color: #ccc;
   }
   button,
   [type="search"],
@@ -324,6 +322,9 @@ button:active {
   .post-item,
   .go-to {
     border-color: #777;
+  }
+  .post-date {
+    color: #ccc;
   }
   .post-message,
   .post-reply {

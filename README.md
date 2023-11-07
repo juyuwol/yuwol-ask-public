@@ -12,12 +12,13 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
 
 ## 동작
 
-[Vercel](https://vercel.com/) 플랫폼 기반으로, [GitHub](https://github.com/)과 [Resend](https://resend.com/)의 REST API를 사용한다. 전부 무료 플랜이 제공되는 서비스로, 사용량이 너무 많지 않은 이상 무료로 운영 가능하다.
+[Vercel](https://vercel.com/)과 [Cloudflare Pages](https://pages.cloudflare.com/) 플랫폼 기반으로, [GitHub](https://github.com/)과 [Resend](https://resend.com/)의 REST API를 사용한다. 전부 무료 플랜이 제공되는 서비스로, 사용량이 너무 많지 않은 이상 무료로 운영 가능하다.
 
 - 정적 페이지 빌드: Node.js - [Eta 템플릿 엔진](https://eta.js.org/) 사용
 - 백엔드: Vercel 서버리스/Edge 함수 - Node.js 런타임
 - 데이터베이스: Vercel KV
 - 이메일 알림: Resend
+- 정적 파일 프록시: Cloudflare Pages
 
 사용자로부터 메시지가 제출되면, 서버리스 함수가 그것을 Vercel KV 데이터베이스에 저장한다. 이때 Resend REST API를 사용해 관리자에게 이메일 알림도 보낸다.
 
@@ -29,7 +30,7 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
 
 참고로 Vercel Hobby 플랜(무료)의 하루(24시간) 빌드 가능 횟수는 100회, Resend 무료 플랜의 하루 발송 가능 횟수는 100회다. 무료로 운영하는 동안 하루에 대충 100번까지 메시지를 받고 답장하는 게 가능한 것이다. 반대로 말하면 그 이상부터는 유지비가 든다.
 
-단점은 답글을 제출하고 사이트가 빌드되기까지 딜레이가 좀 걸린다는 것. 약 960-970개의 데이터가 있을 때 빌드 속도는 20-25초 정도였다.
+단점은 답글을 제출하고 사이트가 빌드되기까지 딜레이가 좀 걸린다는 것. 이를 보완하기 위해 주기적으로 Cloudflare Pages 사이트에 이미지와 개별 메시지/답변 페이지를 업로드하고 Vercel 설정 파일을 재작성하여 프록시로 연결한다. 수동으로 해야 해서 귀찮긴 한데, 이래야 (데이터가 약 1200개 있을 때 기준) 빌드 속도가 9-11초로 유지된다.
 
 ## 디렉토리/파일
 
@@ -39,10 +40,12 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
   - [modify.js](api/modify.js): 이미 작성된 답글을 수정하는 앱 (관리자용)
   - [reply.js](api/reply.js): 답글이 달리지 않은 메시지에 답글을 다는 앱 (관리자용)
   - [unreplied.js](api/unreplied.js): 답글이 달리지 않은 메시지 목록을 가져오는 앱 (관리자용)
+- assets/: 애셋(이미지 생성에 쓰이는 폰트 등) 디렉토리
+- [bin/](bin/): 로컬에서 개발용으로 사용하기 위한 도우미 스크립트들
+  - [build-image.js](bin/build-image.js): 이미지 개별 빌드용
+  - [build-images.js](bin/build-images.js): 이미지 다수 빌드용
+  - [set-proxy.js](bin/set-proxy.js): 프록시 설정용
 - data/: 데이터 디렉토리
-- [image/](image/): 이미지 생성 스크립트/애셋 디렉토리
-  - fonts/: 폰트(이미지 생성에 쓰이는) 디렉토리
-  - [image-builder.js](image/image-builder.js): 이미지 생성 스크립트
 - [public/](public/): 사이트 출력 디렉토리
   - [assets/](public/assets/): CSS/JavaScript 디렉토리
     - [default.css](public/assets/default.css): 기본 스타일시트
@@ -53,25 +56,29 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
   - [mailbox/](public/mailbox/): 관리자 디렉토리
     - [admin.css](public/mailbox/admin.css): 관리자 페이지 스타일시트
     - [admin.js](public/mailbox/admin.js): 관리자 페이지 앱
+- [scripts/](scripts/)
+  - [build.js](build.js): 사이트 빌드 스크립트
+  - [image-builder.js](image/image-builder.js): 이미지 생성 스크립트
 - [templates/](templates/): 페이지 템플릿 디렉토리
-  - [includes/](templates/includes/): 조각 파일 디렉토리
-    - [go-to-list.eta](templates/includes/go-to-list.eta): 목록으로 내비게이션
-    - [message-form.eta](templates/includes/message-form.eta): 메시지 폼
-    - [pager.eta](templates/includes/pager.eta): 페이저
-    - [post-item.eta](templates/includes/post-item.eta): 목록 아이템
-    - [search-form.eta](templates/includes/search-form.eta): 검색 바
   - layouts/: 레이아웃 디렉토리
     - [default.eta](templates/layouts/default.eta): 레이아웃
+  - [particles/](templates/particles/): 조각 파일 디렉토리
+    - [go-to-list.eta](templates/particles/go-to-list.eta): 목록으로 내비게이션
+    - [message-form.eta](templates/particles/message-form.eta): 메시지 폼
+    - [pager.eta](templates/particles/pager.eta): 페이저
+    - [post-item.eta](templates/particles/post-item.eta): 목록 아이템
+    - [search-form.eta](templates/particles/search-form.eta): 검색 바
   - [admin.eta](templates/admin.eta): 관리자 페이지
   - [home.eta](templates/home.eta): 메인 페이지
   - [list.eta](templates/list.eta): 목록 페이지
   - [post.eta](templates/post.eta): 개별 메시지/답글 페이지
   - [search.eta](templates/search.eta): 검색 페이지
   - [status.eta](templates/status.eta): 범용 상태 페이지(에러, 응답 성공 등)
-- [build.js](build.js): 사이트 빌드 스크립트
+- [build.ps1](build.ps1): Windows 환경(로컬)에서의 빌드 도우미 스크립트
 - [config.js](config.js): 설정 파일
 - [middleware.js](middleware.js): Vercel 미들웨어 함수
-- [vercel.json](vercel.json): Vercel 설정 파일
+- [vercel.js](vercel.js): Vercel 설정 파일 (베이스)
+- [vercel.json](vercel.json): Vercel 설정 파일 (사전 빌드 단계에서 리라이트 규칙 추가)
 
 ## 데이터 파일
 
@@ -105,6 +112,7 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
 - `perPage`: 메시지/답글 목록, 검색 결과, 관리자 페이지의 글 목록에서 한 페이지에 한 번에 표시될 글의 수
 - `messageMaxLength`: 받을 메시지의 최대 글자수
 - `origin`: 사이트의 URL Origin. Vercel은 HTTPS가 강제되므로 'https://' + 도메인 형태가 된다.
+- `proxy`: 사이트의 프록시 베이스 URL.
 - `email`:
   - `from`: 이메일 알림의 발신 이메일 주소. Resend에서 따로 본인 소유의 도메인으로 도메인 설정을 하지 않는다면 'onboarding@resend.dev' 이외의 것으로 설정할 수 없다.
   - `to`: 이메일 알림의 수신 이메일 주소
@@ -116,7 +124,7 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
 
 ## 이미지 생성
 
-[Skia의 CanvasKit](https://www.npmjs.com/package/canvaskit-wasm) 라이브러리를 사용한다. [image/image-builder.js](image/image-builder.js) 파일이 이미지 생성을 하는 스크립트다.
+[Skia의 CanvasKit](https://www.npmjs.com/package/canvaskit-wasm) 라이브러리를 사용한다. [scripts/image-builder.js](scripts/image-builder.js) 파일이 이미지 생성을 하는 스크립트다.
 
 본 저장소에는 폰트 파일이 빠져 있지만, 폰트를 넣지 않으면 CanvasKit은 텍스트를 렌더링하지 못한다. 이미지 생성 스크립트 또한 폰트가 없는 경우를 상정하지 않고 작성되었다.
 
@@ -237,9 +245,9 @@ builder.free();
 
 ## 템플릿 설정
 
-본 저장소에는 포함되어 있지 않지만 템플릿 출력에서 호출되는 파일이 두 개 있다. (출력 디렉토리 기준으로) '/favicon.ico'와 '/images/cover.png' 두 파일이다.
+본 저장소에는 포함되어 있지 않지만 템플릿 출력에서 호출되는 파일이 두 개 있다. (출력 디렉토리 기준으로) '/favicon.ico'와 '/cover.png' 두 파일이다.
 
-템플릿 코드를 손대지 않으면서 문제 없이 돌아가게 만들려면, 각각 'public/favicon.ico', 'public/images/cover.png'에 파일을 추가하면 된다.
+템플릿 코드를 손대지 않으면서 문제 없이 돌아가게 만들려면, 각각 'public/favicon.ico', 'public/cover.png'에 파일을 추가하면 된다.
 
 여기서 'favicon.ico' 파일은 파비콘 역할이다. 확장자와 별개로, ICO 포맷이 아닌 PNG 포맷이어야 한다. [vercel.json](vercel.json) 파일에서 헤더를 PNG 포맷으로 명시해 두었기 때문이다.
 
@@ -259,11 +267,13 @@ builder.free();
 - `ADMIN_PASSWORD`: 관리자 암호
 - `GITHUB_TOKEN`: GitHub Personal Access Token (Classic) (repo 권한 체크)
 - `RESEND_KEY`: Resend API 키
+- `PROJECT_ID`: 프로젝트 ID (답변 제출 시 빌드 완료 여부 자동 체크용)
+- `VERCEL_TOKEN`: Vercel 토큰 (답변 제출 시 빌드 완료 여부 자동 체크용)
 
 ## FAQ
 
 - 이 소스로 저만의 익명 메시지 응모 사이트를 만들고 싶습니다. 가능한가요?
-  - 네, 그러라고 오픈소스로 풀었습니다. 하지만 사용하실 때 코드에 있는 제 사적인 정보들은 반드시 지워주세요. [config.js](config.js), [templates/layouts/default.eta](templates/layouts/default.eta), [templates/home.eta](templates/home.eta)을 수정해 주시면 됩니다.
+  - 네, 그러라고 오픈소스로 풀었습니다. 하지만 사용하실 때 각 코드에 있는 제 사적인 정보들은 반드시 지워주세요.
 - 이 소스를 수정해서 제 사이트를 만들고 있는데, 어려움이 생겼습니다. 도와주실 수 있나요?
   - 네, 질문은 환영합니다! 제 [트위터(@JuYuwol)](https://twitter.com/JuYuwol)나 [사서함](https://ask.yuwol.pe.kr/)으로 와 주세요.
 - 전혀 모르겠지만 (여러 필사적인 사정으로) 그래도 갖고 싶습니다. 대신 설치해 주실 수 있나요?

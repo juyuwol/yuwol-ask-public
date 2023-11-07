@@ -15,7 +15,11 @@ if (!toggle) return;
 
 var text = document.getElementById('message');
 var image = document.createElement('img');
+var width = document.querySelector('[property="og:image:width"]');
+var height = document.querySelector('[property="og:image:height"]');
 image.alt = text.textContent;
+if (width) image.width = width.getAttribute('content');
+if (height) image.height = height.getAttribute('content');
 
 toggle.onchange = function () {
   if (document.contains(image)) {

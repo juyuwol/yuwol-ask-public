@@ -3,12 +3,12 @@
     <h2><a class="post-link post-title" href="<%= item.path || '' %>"><%= item.title || '' %></a></h2>
     <div class="post-info">
       <h3 class="post-label">메시지</h3>
-      <p class="post-date"><time class="post-message-date" datetime="<%= item.messageDate || '' %>"><%= item.messageDateText || '' %></time></p>
+      <p class="post-date post-message-date"><%= item.messageDateText || '' %></p>
     </div>
     <pre class="post-message"><%= item.message || '' %></pre>
     <div class="post-info">
       <h3 class="post-label">답글</h3>
-      <p class="post-date"><time class="post-reply-date" datetime="<%= item.replyDate || '' %>"><%= item.replyDateText || '' %></time></p>
+      <p class="post-date post-reply-date"><%= item.replyDateText || '' %></p>
     </div>
     <pre class="post-reply"><%= item.reply || '' %></pre>
   </li>

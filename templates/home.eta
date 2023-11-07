@@ -1,8 +1,8 @@
-<% layout('layouts/default') %>
-<% it.title = '메시지 보내기' %>
-<% it.scripts = [{ src: '/assets/message.js', defer: true }] %>
-<%~ include('includes/message-form', { messageMaxLength: it.messageMaxLength, description: it.description }) %>
-<%~ include('includes/go-to-list') %>
+<% layout('layouts/default');
+   it.title = '메시지 보내기';
+   it.scripts = [{ src: '/assets/message.js', defer: true }]; %>
+<%~ include('particles/message-form', { messageMaxLength: it.messageMaxLength, description: it.description }) %>
+<%~ include('particles/go-to-list') %>
 <h2>이곳에 대해</h2>
 <p>저, 주유월 개인에 대한 익명 메시지 투고처 겸 게시처입니다.</p>
 <p>페잉이 오래된 데이터를 지워버린다는 사실을 2년어치에 가까운 막대한 데이터를 소실하고서야 깨닫고, 그나마 살아 있는 페잉 데이터를 보존하면서 익명 메시지를 받을 새로운 수단을 확보하기 위해 만들었습니다.</p>

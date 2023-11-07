@@ -1,7 +1,7 @@
-<% layout('layouts/default') %>
-<% it.title = '관리' %>
-<% it.styles = ['/mailbox/assets/admin.css'] %>
-<% it.scripts = [{ src: '/mailbox/assets/admin.js', defer: true }] %>
+<% layout('layouts/default');
+   it.title = '관리';
+   it.styles = ['/mailbox/assets/admin.css'];
+   it.scripts = [{ src: '/mailbox/assets/admin.js', defer: true }]; %>
 <p class="tabs">
   <label class="radio-label"><input class="tab" type="radio" name="tab" data-tab="unreplied"> 답하기</label>
   <label class="radio-label"><input class="tab" type="radio" name="tab" data-tab="replied"> 고치기</label>
@@ -17,7 +17,7 @@
 <form id="delete" action="/mailbox/delete" method="post" hidden="">
   <p><button class="submit" type="submit">선택 삭제</button></p>
 </form>
-<div id="content" data-per-page="<%= it.perPage %>"></div>
+<div id="content" data-per-page="<%= it.perPage %>" data-vercel-token="<%= it.VERCEL_TOKEN || '' %>" data-project-id="<%= it.PROJECT_ID || '' %>"></div>
 <p class="admin-pager" hidden="">
   <button class="admin-pager-first" type="button">맨앞</button>
   <button class="admin-pager-prev" type="button">이전</button>
@@ -46,12 +46,14 @@
     <p class="reply-date"></p>
     <pre class="reply"></pre>
     <p><a class="link">바로가기</a></p>
+    <p><a class="tweet-link" hidden="">트윗하기</a></p>
   </div>
 </template>
 <template id="template-modify-item">
   <form class="post-item" action="/mailbox/modify" method="post">
     <input name="id" type="hidden">
     <p><label class="checkbox-label"><input class="checkbox" type="checkbox"> 삭제</label></p>
+    <h2><a class="link title"></a></h2>
     <p class="message-date"></p>
     <pre class="message"></pre>
     <p class="reply-date"></p>

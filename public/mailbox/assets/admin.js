@@ -1,7 +1,7 @@
 (function () {
 
 const INDEX_URL = {
-  'replied': '/search/data.json',
+  'replied': '/mailbox/replied.json',
   'unreplied': '/mailbox/unreplied.json',
 };
 
@@ -30,6 +30,8 @@ let content = document.getElementById('content');
 let tab, page, lastPage;
 
 const perPage = parseInt(content.dataset.perPage);
+const vercelToken = content.dataset.vercelToken;
+const projectId = content.dataset.projectId;
 
 loading.textContent = '로딩중...';
 for (const button of tabs) {
@@ -186,11 +188,13 @@ function createModifyList(data) {
     const idField = elements.namedItem('id');
     const replyField = elements.namedItem('reply');
     const checkbox = form.querySelector('.checkbox');
+    const linkElm = form.querySelector('.link');
+    const titleElm = form.querySelector('.title');
     const messageDateElm = form.querySelector('.message-date');
     const messageElm = form.querySelector('.message');
     const replyDateElm = form.querySelector('.reply-date');
     const replyElm = form.querySelector('.reply');
-    const { id, messageDate, message, replyDate, reply } = e;
+    const { id, title, messageDate, message, replyDate, reply } = e;
     form.id = id;
     idField.value = id;
     replyField.value = reply;
@@ -202,6 +206,8 @@ function createModifyList(data) {
         deleteIds[tab].delete(id);
       }
     };
+    linkElm.href = `/posts/${id}.html`;
+    titleElm.textContent = title;
     messageDateElm.textContent = messageDate;
     messageElm.textContent = message;
     replyDateElm.textContent = replyDate;
@@ -249,6 +255,7 @@ function createDeleteList(data) {
 async function submitReply(event) {
   event.preventDefault();
   if (!window.confirm('제출합니까?')) return;
+  const now = Date.now();
   const form = event.currentTarget;
   const elements = form.elements;
   const id = elements.namedItem('id').value;
@@ -271,6 +278,7 @@ async function submitReply(event) {
     const replyElm = item.querySelector('.reply');
     const imageElm = item.querySelector('.image');
     const linkElm = item.querySelector('.link');
+    const tweetElm = item.querySelector('.tweet-link');
     messageDateElm.textContent = messageDate;
     messageElm.textContent = message;
     replyDateElm.textContent = replyDate;
@@ -285,7 +293,37 @@ async function submitReply(event) {
     }
     index[tab] = newIndex;
     updateCount(newIndex.length);
-    window.alert('제출 성공');
+
+    try {
+      const url = new URL('https://api.vercel.com/v6/deployments');
+      const params = new URLSearchParams();
+      const opts = { headers: { 'authorization': `Bearer ${vercelToken}` } };
+      params.append('limit', '1');
+      params.append('projectId', projectId);
+      params.append('since', now);
+      url.search = params;
+      let isReady = false;
+      for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => {
+          setTimeout(resolve, (i === 0) ? 8000 : 1000);
+        });
+        const res = await fetch(url, opts);
+        if (!res.ok) throw new Error();
+        const { deployments } = await res.json();
+        if (deployments.length === 0 || deployments[0].state !== 'READY') {
+          continue;
+        }
+        isReady = true;
+        break;
+      }
+      if (!isReady) throw new Error();
+      const tweet = new URL('https://twitter.com/intent/tweet');
+      const tweetParams = new URLSearchParams();
+      tweetParams.append('text', `${reply} ${linkElm.href}`);
+      tweet.search = tweetParams;
+      tweetElm.href = tweet;
+      tweetElm.hidden = false;
+    } catch (e) {}
   } else {
     window.alert(`제출 실패: ${res.status}\n\n${await res.text()}`);
   }

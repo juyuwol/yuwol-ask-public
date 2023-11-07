@@ -1,5 +1,5 @@
-<% layout('layouts/default') %>
-<% it.scripts = [{ src: '/assets/message.js', defer: true }] %>
+<% layout('layouts/default');
+   it.scripts = [{ src: '/assets/message.js', defer: true }]; %>
 <article>
   <div class="post-header">
     <h2 class="post-title"><%= it.title %></h2>
@@ -17,5 +17,5 @@
   <pre class="post-reply"><%= it.reply %></pre>
 </article>
 <p class="post-share"><a href="https://twitter.com/intent/tweet?text=<%~ encodeURIComponent(`${it.reply} ${it.origin}${it.path}`) %>">트위터 공유</a></p>
-<%~ include('includes/go-to-list') %>
-<%~ include('includes/message-form', { messageMaxLength: it.messageMaxLength, description: it.description }) %>
+<%~ include('particles/go-to-list') %>
+<%~ include('particles/message-form', { messageMaxLength: it.messageMaxLength, description: it.description }) %>

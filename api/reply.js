@@ -1,26 +1,38 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import config from '../config.js';
-import ImageBuilder from '../image/image-builder.js';
+import ImageBuilder from '../scripts/image-builder.js';
 
 export default async function handler(req, res) {
   const time = Date.now();
 
   const { id, message, messageDate, reply, value } = req.body;
   const replyDate = new Date(time + 9 * 60 * 60 * 1000).toISOString().slice(0, -1) + '+09:00';
-  const content = JSON.stringify({ id, messageDate, message, replyDate, reply }, undefined, 2) + '\n';
-  const imageBase64 = await (async () => {
-    const dir = join(process.cwd(), 'image', 'fonts');
+  const { imageBase64, width, height } = await (async () => {
+    const dir = join(process.cwd(), 'assets');
     const files = config.fontFiles;
     const promises = [];
     for (const file of files) {
       promises.push(readFile(join(dir, file)));
     }
     const builder = new ImageBuilder(await Promise.all(promises));
-    const image = builder.generate(message);
+    const { data, width, height } = builder.generate(message);
     builder.free();
-    return Buffer.from(image).toString('base64');
+    return {
+      imageBase64: Buffer.from(data).toString('base64'),
+      width,
+      height,
+    };
   })();
+  const content = JSON.stringify({
+    id,
+    messageDate,
+    message,
+    replyDate,
+    reply,
+    width,
+    height,
+  }, undefined, 2) + '\n';
 
   try {
     const GITHUB_OWNER = process.env['VERCEL_GIT_REPO_OWNER'];

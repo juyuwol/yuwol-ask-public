@@ -130,6 +130,8 @@ export default class ImageBuilder {
     // Get image data bytes
     const image = surface.makeImageSnapshot();
     const data = image.encodeToBytes();
+    const width = image.width();
+    const height = image.height();
 
     // Free up memory
     surface.delete();
@@ -138,7 +140,7 @@ export default class ImageBuilder {
     builder.delete();
 
     // Return bytes
-    return data;
+    return { data, width, height };
   }
 
   free() {

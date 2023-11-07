@@ -6,9 +6,11 @@ var queries = splitQuery();
 var page = getPage();
 var xhr = new XMLHttpRequest();
 var cache = {};
-var data, field, stats, pagers, list, itemTemplate, perPage;
+var pagers = [];
+var data, field, stats, list, itemTemplate, perPage;
 
-window.addEventListener('popstate', function () {
+window.addEventListener('popstate', function (event) {
+  if (!event.state) return;
   queryRaw = getQuery();
   query = decodeQuery();
   queries = splitQuery();
@@ -27,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
   itemTemplate = document.getElementById('post-item-template').content.firstElementChild;
   perPage = parseInt(list.dataset.perPage);
   form.onsubmit = updateQuery;
-  pagers = [];
   for (i = 0; pager = pagerCollection[i], pager; i++) {
     first = pager.getElementsByClassName('pager-first')[0];
     prev = pager.getElementsByClassName('pager-prev')[0];
@@ -58,11 +59,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (!query) return;
   field.value = query;
-  updateLoadingCounter(-1);
+  updateLoadingState(-1);
 });
 
 document.documentElement.classList.add('js-search');
-if (query) updateLoadingCounter(1);
+if (query) updateLoadingState(1);
 
 xhr.onloadend = function () {
   if (xhr.status >= 200 && xhr.status < 300) data = JSON.parse(xhr.response);
@@ -79,17 +80,6 @@ xhr.onloadend = function () {
 };
 xhr.open('GET', '/search/data.json');
 xhr.send();
-
-function updateLoadingCounter(v) {
-  var count = parseInt(document.documentElement.dataset.loading);
-  if (isNaN(count)) count = 0;
-  count += v;
-  if (count <= 0) {
-    delete document.documentElement.dataset.loading;
-  } else {
-    document.documentElement.dataset.loading = count;
-  }
-}
 
 function getURL(p) {
   if (p === undefined) p = page;
@@ -165,7 +155,7 @@ function search() {
       e.pager.hidden = true;
     }
     stats.textContent = '';
-    listNew = list.cloneNode();
+    listNew = list.cloneNode(false);
     list.parentNode.replaceChild(listNew, list);
     list = listNew;
     return;
@@ -190,7 +180,7 @@ function search() {
     return arr;
   })();
   var total = results.length;
-  var lastPage = Math.ceil(total / perPage);
+  var lastPage = (total > perPage) ? Math.ceil(total / perPage) : 1;
 
   stats.textContent = '총 ' + total + '개의 일치하는 메시지/답글';
 
@@ -244,7 +234,7 @@ function search() {
   if (cache[query].lists && cache[query].lists[page]) {
     listNew = cache[query].lists[page];
   } else {
-    listNew = list.cloneNode();
+    listNew = list.cloneNode(false);
 
     var qlen = queries.length;
     var result, item, link, title, message, messageDate, reply, replyDate;
@@ -258,11 +248,9 @@ function search() {
       replyDate = item.querySelector('.post-reply-date');
   
       link.href = '/posts/' + result.id + '.html';
-      title.textContent = titleFilter(result.messageDate, result.count);
-      messageDate.textContent = dateFilter(result.messageDate);
-      replyDate.textContent = dateFilter(result.replyDate);
-      messageDate.setAttribute('datetime', result.messageDate);
-      replyDate.setAttribute('datetime', result.replyDate);
+      title.textContent = result.title;
+      messageDate.textContent = result.messageDate;
+      replyDate.textContent = result.replyDate;
       highlight(message, result.message, qlen);
       highlight(reply, result.reply, qlen);
   
@@ -319,22 +307,10 @@ function highlight(elm, text, qlen) {
   if (loc < tlen) elm.appendChild(document.createTextNode(text.slice(loc)));
 }
 
-function titleFilter(date, count) {
-  var mm = date.slice(5, 7);
-  var dd = date.slice(8, 10);
-  if (mm[0] === '0') mm = mm[1];
-  if (dd[0] === '0') dd = dd[1];
-  return date.slice(2, 4) + '년 ' + mm + '월 ' + dd + '일 ' + count + '번째 메시지';
-}
-
-function dateFilter(date) {
-  var mm = date.slice(5, 7);
-  var dd = date.slice(8, 10);
-  if (mm[0] === '0') mm = mm[1];
-  if (dd[0] === '0') dd = dd[1];
-  var ss = date.slice(0, 4) + '년 ' + mm + '월 ' + dd + '일';
-  if (date.length > 10) ss += ' ' + date.slice(11, 19);
-  return ss;
+function updateLoadingState(value) {
+  if (!window._loading) window._loading = 0;
+  window._loading += value;
+  document.documentElement.hidden = (window._loading > 0);
 }
 
 })();

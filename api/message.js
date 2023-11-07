@@ -94,7 +94,15 @@ export default async function handler(req, res) {
         to: config.email.to,
         subject: '익명 메시지 도착',
         html: [
-          `<p style="white-space: pre-wrap;">${message}</p>`,
+          `<p style="white-space: pre-wrap;">${
+            message.replace(/&|<|>/g, m => {
+              switch (m) {
+              case '&': return '&amp;';
+              case '<': return '&lt;';
+              case '>': return '&gt;';
+              }
+            })
+          }</p>`,
           `<p>- ${messageDate.replace('T', ' ').slice(0, -10)}</p>`,
           `<p><a href="${config.origin}/mailbox/">답글 쓰기</a></p>`,
         ].join(''),

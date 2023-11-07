@@ -1,9 +1,10 @@
-<% layout('layouts/default') %>
-<% it.title = '메시지/답글 목록' %>
-<%~ include('includes/search-form') %>
+<% layout('layouts/default');
+   it.title = '메시지/답글 목록';
+   const pager = include('particles/pager', { pager: it.pager }); %>
+<%~ include('particles/search-form') %>
 <p class="post-stats">총 <%= it.total %>개의 메시지/답글</p>
-<%~ include('includes/pager', { pager: it.pager }) %>
+<%~ pager %>
 <ul class="post-list">
-<%~ include('includes/post-item', { items: it.items }) %>
+<%~ include('particles/post-item', { items: it.items }) %>
 </ul>
-<%~ include('includes/pager', { pager: it.pager }) %>
+<%~ pager %>

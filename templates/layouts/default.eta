@@ -8,23 +8,27 @@
   <link rel="stylesheet" href="/assets/default.css">
 <% if (it.styles) { for (const style of it.styles) { %>
   <link rel="stylesheet" href="<%= style %>">
-<% } } %>
-<% if (it.scripts) { for (const script of it.scripts) { %>
+<% } }
+   if (it.scripts) { for (const script of it.scripts) { %>
   <script src="<%= script.src %>"<% if (script.defer) { %> defer=""<% } %>></script>
-<% } } %>
-<% if (it.path) { %>
+<% } }
+   if (it.path) { %>
   <link rel="canonical" href="<%= it.origin + it.path %>">
-<% } %>
-<% if (it.path === '/') { %>
+<% }
+   if (it.path === '/') { %>
   <meta name="twitter:card" content="summary">
   <meta property="og:title" content="<%= it.siteTitle %>">
-  <meta property="og:image" content="<%= it.origin %>/images/cover.png">
+  <meta property="og:image" content="<%= it.origin %>/cover.png">
   <meta property="og:description" content="<%= it.description %>">
 <% } else if (it.image) { %>
   <meta name="twitter:card" content="summary_large_image">
   <meta property="og:title" content="<%= it.title %>">
   <meta property="og:image" content="<%= it.origin + it.image %>">
   <meta property="og:image:alt" content="<%= it.message %>">
+<%   if (it.width && it.height) { %>
+  <meta property="og:image:width" content="<%= it.width %>">
+  <meta property="og:image:height" content="<%= it.height %>">
+<%   } %>
   <meta property="og:description" content="<%= it.siteTitle %>">
 <% } %>
 </head>
