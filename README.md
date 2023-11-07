@@ -128,7 +128,7 @@ Peing과 달리, 이미지에서 이모지 지원이 된다.
 
 본 저장소에는 폰트 파일이 빠져 있지만, 폰트를 넣지 않으면 CanvasKit은 텍스트를 렌더링하지 못한다. 이미지 생성 스크립트 또한 폰트가 없는 경우를 상정하지 않고 작성되었다.
 
-폰트는 'image' 디렉토리 하위에 'font' 디렉토리를 생성해서 폰트 파일들을 위치시키고, 'config.js' 객체의 `fontFiles` 필드에 파일명들을 배열 형태로 기입하여 설정한다. 먼저 오는 폰트일수록 글리프 우선순위가 높다. 가령 값이 `['A.woff', 'B.ttf']`고, A와 B 폰트 모두 'a' 문자에 대한 글리프를 갖고 있다면, 이미지에 출력되는 'a' 문자는 A 폰트의 글리프다.
+폰트는 'assets' 디렉토리 하위에 폰트 파일들을 위치시키고, 'config.js' 객체의 `fontFiles` 필드에 파일명들을 배열 형태로 기입하여 설정한다. 먼저 오는 폰트일수록 글리프 우선순위가 높다. 가령 값이 `['A.woff', 'B.ttf']`고, A와 B 폰트 모두 'a' 문자에 대한 글리프를 갖고 있다면, 이미지에 출력되는 'a' 문자는 A 폰트의 글리프다.
 
 이모지를 표시하려면 이모지 폰트를 사용해야 한다. 본 프로젝트에서는 Mozilla의 [twemoji-colr](https://github.com/mozilla/twemoji-colr) 프로젝트(트위터 이모지를 폰트화한다)에서 배포하는 TTF 파일을 사용했다.
 
@@ -149,7 +149,7 @@ import { fileURLToPath } from 'url';
 import config from './config.js';
 
 // 생성자 불러오기
-import ImageBuilder from './image/image-builder.js';
+import ImageBuilder from './scripts/image-builder.js';
 
 // 디렉토리 설정
 const projectDir = fileURLToPath(dirname(import.meta.url));
@@ -157,7 +157,7 @@ const dataDir = join(projectDir, 'data');
 
 // 폰트 불러오기
 const fonts = await Promise.all((() => {
-  const dir = join(projectDir, 'image', 'fonts');
+  const dir = join(projectDir, 'assets');
   const files = config.fontFiles;
   const promises = [];
   for (const file of files) {
@@ -194,7 +194,7 @@ import { fileURLToPath } from 'url';
 import config from './config.js';
 
 // 생성자 불러오기
-import ImageBuilder from './image/image-builder.js';
+import ImageBuilder from './scripts/image-builder.js';
 
 // 디렉토리 설정
 const projectDir = fileURLToPath(dirname(import.meta.url));
@@ -203,7 +203,7 @@ const imageDir = join(projectDir, 'public', 'images');
 
 // 폰트 불러오기
 const fonts = await Promise.all((() => {
-  const dir = join(projectDir, 'image', 'fonts');
+  const dir = join(projectDir, 'assets');
   const files = config.fontFiles;
   const promises = [];
   for (const file of files) {
